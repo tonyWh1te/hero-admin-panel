@@ -1,10 +1,12 @@
+import { useCallback } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { heroesFetching, heroesFetched, heroesFetchingError } from '../../actions';
+import { heroesFetching, heroesFetched, heroesFetchingError, heroDeleted } from '../../actions';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
 import Spinner from '../spinner/Spinner';
+import { BASE_URL } from '../../utils/constants';
 
 // Задача для этого компонента:
 // При клике на "крестик" идет удаление персонажа из общего состояния
@@ -18,12 +20,21 @@ const HeroesList = () => {
 
   useEffect(() => {
     dispatch(heroesFetching());
-    request('https://a80cca7ab3fe2a8b.mokky.dev/heroes')
+    request(`${BASE_URL}/heroes`)
       .then((data) => dispatch(heroesFetched(data)))
       .catch(() => dispatch(heroesFetchingError()));
 
     // eslint-disable-next-line
   }, []);
+
+  const onDelete = useCallback(
+    (id) => {
+      request(`${BASE_URL}/heroes/${id}`, 'DELETE')
+        .then(() => dispatch(heroDeleted(id)))
+        .catch((e) => console.error(e.message));
+    },
+    [dispatch, request],
+  );
 
   if (heroesLoadingStatus === 'loading') {
     return <Spinner />;
@@ -36,11 +47,12 @@ const HeroesList = () => {
       return <h5 className="text-center mt-5">Героев пока нет</h5>;
     }
 
-    return arr.map(({ id, ...props }) => {
+    return arr.map((item) => {
       return (
         <HeroesListItem
-          key={id}
-          {...props}
+          key={item.id}
+          onDelete={onDelete}
+          {...item}
         />
       );
     });
