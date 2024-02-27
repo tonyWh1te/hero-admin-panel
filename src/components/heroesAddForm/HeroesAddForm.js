@@ -1,4 +1,11 @@
+import { useState, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHttp } from '../../hooks/http.hook';
+import { toast } from 'react-toastify';
 
+import { heroesCreated, heroesCreation, heroesCreationError } from '../../actions';
+import HeroesAddFormLayout from './HeroesAddFormLayout';
+import { BASE_URL } from '../../utils/constants';
 
 // Задача для этого компонента:
 // Реализовать создание нового героя с введенными данными. Он должен попадать
@@ -11,48 +18,104 @@
 // данных из фильтров
 
 const HeroesAddForm = () => {
-    return (
-        <form className="border p-4 shadow-lg rounded">
-            <div className="mb-3">
-                <label htmlFor="name" className="form-label fs-4">Имя нового героя</label>
-                <input 
-                    required
-                    type="text" 
-                    name="name" 
-                    className="form-control" 
-                    id="name" 
-                    placeholder="Как меня зовут?"/>
-            </div>
+  const [hero, setHero] = useState({
+    name: '',
+    description: '',
+    element: '',
+    img: '',
+    errors: false,
+  });
 
-            <div className="mb-3">
-                <label htmlFor="text" className="form-label fs-4">Описание</label>
-                <textarea
-                    required
-                    name="text" 
-                    className="form-control" 
-                    id="text" 
-                    placeholder="Что я умею?"
-                    style={{"height": '130px'}}/>
-            </div>
+  const dispatch = useDispatch();
+  const heroesCreationStatus = useSelector((state) => state.heroesCreationStatus);
 
-            <div className="mb-3">
-                <label htmlFor="element" className="form-label">Выбрать элемент героя</label>
-                <select 
-                    required
-                    className="form-select" 
-                    id="element" 
-                    name="element">
-                    <option >Я владею элементом...</option>
-                    <option value="fire">Огонь</option>
-                    <option value="water">Вода</option>
-                    <option value="wind">Ветер</option>
-                    <option value="earth">Земля</option>
-                </select>
-            </div>
+  const { request } = useHttp();
 
-            <button type="submit" className="btn btn-primary">Создать</button>
-        </form>
-    )
-}
+  const imgInputRef = useRef();
+
+  const onReset = () => {
+    setHero({
+      name: '',
+      description: '',
+      element: '',
+      img: '',
+      errors: false,
+    });
+
+    imgInputRef.current.value = '';
+  };
+
+  const onHeroChange = (event) => {
+    const { name, value } = event.target;
+
+    setHero({
+      ...hero,
+      [name]: value,
+    });
+  };
+
+  const onImageChange = (e) => {
+    const file = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const config = {
+      url: `${BASE_URL}/uploads`,
+      method: 'POST',
+      headers: {},
+      body: formData,
+    };
+
+    request(config.url, config.method, config.body, config.headers)
+      .then((data) => {
+        setHero({
+          ...hero,
+          img: data.url,
+        });
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const onDataPost = (data) => {
+    dispatch(heroesCreated({ ...hero, id: data.id }));
+    toast.success('Герой создан');
+  };
+
+  const onError = () => {
+    dispatch(heroesCreationError());
+    toast.error('Не удалось создать героя');
+  };
+
+  const onHeroAdd = (e) => {
+    e.preventDefault();
+
+    const { name, element, img, description } = hero;
+    const errors = !name || !element || !img || !description;
+
+    if (errors) {
+      setHero({ ...hero, errors });
+      return;
+    }
+
+    dispatch(heroesCreation());
+
+    request(`${BASE_URL}/heroes`, 'POST', JSON.stringify({ name, element, img, description }))
+      .then(onDataPost)
+      .catch(onError)
+      .finally(onReset);
+  };
+
+  return (
+    <HeroesAddFormLayout
+      {...hero}
+      onHeroChange={onHeroChange}
+      onHeroAdd={onHeroAdd}
+      onImageChange={onImageChange}
+      heroesCreationStatus={heroesCreationStatus}
+      imgInputRef={imgInputRef}
+    />
+  );
+};
 
 export default HeroesAddForm;

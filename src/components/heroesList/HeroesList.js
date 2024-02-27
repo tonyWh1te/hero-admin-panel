@@ -37,7 +37,7 @@ const HeroesList = () => {
   );
 
   if (heroesLoadingStatus === 'loading') {
-    return <Spinner />;
+    return <Spinner classes="mt-5" />;
   } else if (heroesLoadingStatus === 'error') {
     return <h5 className="text-center mt-5">Ошибка загрузки</h5>;
   }

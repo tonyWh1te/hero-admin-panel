@@ -3,11 +3,15 @@ import {
   HEROES_FETCHED,
   HEROES_FETCHING_ERROR,
   HERO_DELETED,
+  HEROES_CREATED,
+  HEROES_CREATION,
+  HEROES_CREATION_ERROR,
 } from '../utils/constants';
 
 const initialState = {
   heroes: [],
   heroesLoadingStatus: 'idle',
+  heroesCreationStatus: 'idle',
   filters: [],
 };
 
@@ -35,6 +39,22 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         heroes: newHeroes,
+      };
+    case HEROES_CREATED:
+      return {
+        ...state,
+        heroes: [...state.heroes, action.payload],
+        heroesCreationStatus: 'idle',
+      };
+    case HEROES_CREATION:
+      return {
+        ...state,
+        heroesCreationStatus: 'creation',
+      };
+    case HEROES_CREATION_ERROR:
+      return {
+        ...state,
+        heroesCreationStatus: 'error',
       };
     default:
       return state;
