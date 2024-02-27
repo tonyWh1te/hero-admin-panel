@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 
 import { heroesFetching, heroesFetched, heroesFetchingError, heroDeleted } from '../../actions';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import { BASE_URL } from '../../utils/constants';
 
@@ -14,7 +15,14 @@ import { BASE_URL } from '../../utils/constants';
 // Удаление идет и с json файла при помощи метода DELETE
 
 const HeroesList = () => {
-  const { heroes, heroesLoadingStatus } = useSelector((state) => state);
+  const { filteredHeroes, heroesLoadingStatus } = useSelector(
+    (state) => ({
+      filteredHeroes: state.filteredHeroes,
+      heroesLoadingStatus: state.heroesLoadingStatus,
+    }),
+    shallowEqual,
+  );
+
   const dispatch = useDispatch();
   const { request } = useHttp();
 
@@ -39,7 +47,7 @@ const HeroesList = () => {
   if (heroesLoadingStatus === 'loading') {
     return <Spinner classes="mt-5" />;
   } else if (heroesLoadingStatus === 'error') {
-    return <h5 className="text-center mt-5">Ошибка загрузки</h5>;
+    return <ErrorMessage classes="mt-5">Ошибка загрузки</ErrorMessage>;
   }
 
   const renderHeroesList = (arr) => {
@@ -58,7 +66,7 @@ const HeroesList = () => {
     });
   };
 
-  const elements = renderHeroesList(heroes);
+  const elements = renderHeroesList(filteredHeroes);
   return <ul>{elements}</ul>;
 };
 

@@ -14,6 +14,9 @@ const HeroesAddFormLayout = ({
   onImageChange,
   heroesCreationStatus,
   imgInputRef,
+  filters,
+  filtersLoadingStatus,
+  renderFilters,
 }) => {
   const btnSubmitContent = heroesCreationStatus === 'creation' ? <Spinner /> : 'Создать';
 
@@ -72,10 +75,7 @@ const HeroesAddFormLayout = ({
           onChange={onHeroChange}
         >
           <option>Я владею элементом...</option>
-          <option value="fire">Огонь</option>
-          <option value="water">Вода</option>
-          <option value="wind">Ветер</option>
-          <option value="earth">Земля</option>
+          {renderFilters(filters, filtersLoadingStatus)}
         </select>
         <InputErrorMessage hasError={hasError(errors, element)} />
       </div>

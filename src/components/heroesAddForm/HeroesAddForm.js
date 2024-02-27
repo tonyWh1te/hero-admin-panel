@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { useHttp } from '../../hooks/http.hook';
 import { toast } from 'react-toastify';
 
@@ -27,7 +27,15 @@ const HeroesAddForm = () => {
   });
 
   const dispatch = useDispatch();
-  const heroesCreationStatus = useSelector((state) => state.heroesCreationStatus);
+
+  const { heroesCreationStatus, filters, filtersLoadingStatus } = useSelector(
+    (state) => ({
+      heroesCreationStatus: state.heroesCreationStatus,
+      filters: state.filters,
+      filtersLoadingStatus: state.filtersLoadingStatus,
+    }),
+    shallowEqual,
+  );
 
   const { request } = useHttp();
 
@@ -78,7 +86,7 @@ const HeroesAddForm = () => {
   };
 
   const onDataPost = (data) => {
-    dispatch(heroesCreated({ ...hero, id: data.id }));
+    dispatch(heroesCreated({ ...data }));
     toast.success('Герой создан');
   };
 
@@ -100,10 +108,41 @@ const HeroesAddForm = () => {
 
     dispatch(heroesCreation());
 
-    request(`${BASE_URL}/heroes`, 'POST', JSON.stringify({ name, element, img, description }))
+    const newHero = {
+      name,
+      element,
+      img,
+      description,
+    };
+
+    request(`${BASE_URL}/heroes`, 'POST', JSON.stringify(newHero))
       .then(onDataPost)
       .catch(onError)
       .finally(onReset);
+  };
+
+  const renderFilters = (filters, filtersLoadingStatus) => {
+    if (filtersLoadingStatus === 'loading') {
+      return <option>Загрузка списка...</option>;
+    } else if (filtersLoadingStatus === 'error') {
+      return <option>Ошибка загрузки</option>;
+    }
+
+    const renderedFilters = filters.map(({ name, label }) => {
+      //eslint-disable-next-line
+      if (name === 'all') return;
+
+      return (
+        <option
+          key={name}
+          value={name}
+        >
+          {label}
+        </option>
+      );
+    });
+
+    return renderedFilters;
   };
 
   return (
@@ -114,6 +153,9 @@ const HeroesAddForm = () => {
       onImageChange={onImageChange}
       heroesCreationStatus={heroesCreationStatus}
       imgInputRef={imgInputRef}
+      filters={filters}
+      filtersLoadingStatus={filtersLoadingStatus}
+      renderFilters={renderFilters}
     />
   );
 };
