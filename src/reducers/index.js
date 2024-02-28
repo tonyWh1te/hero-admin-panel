@@ -54,7 +54,7 @@ const reducer = (state = initialState, action) => {
         ),
       };
     case HEROES_CREATED:
-      const newList = [...state.heroes, action.payload];
+      const newList = [action.payload, ...state.heroes];
 
       return {
         ...state,

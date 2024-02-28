@@ -14,6 +14,24 @@ const SET_ACTIVE_FILTER = 'SET_ACTIVE_FILTER';
 // URL
 const BASE_URL = 'https://a80cca7ab3fe2a8b.mokky.dev';
 
+// motion variants
+const liVariants = {
+  visible: (i) => ({
+    y: 0,
+    opacity: 1,
+    transition: { delay: i * 0.2, duration: 0.2, type: 'ease' },
+  }),
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.5,
+    transition: { type: 'spring', stiffness: 900, damping: 40 },
+  },
+};
+
 export {
   HEROES_FETCHING,
   HEROES_FETCHED,
@@ -27,4 +45,5 @@ export {
   FILTERS_FETCHED,
   FILTERS_FETCHING_ERROR,
   SET_ACTIVE_FILTER,
+  liVariants,
 };

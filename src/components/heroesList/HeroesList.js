@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { AnimatePresence } from 'framer-motion';
 
 import { heroesFetching, heroesFetched, heroesFetchingError, heroDeleted } from '../../actions';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
@@ -55,11 +56,12 @@ const HeroesList = () => {
       return <h5 className="text-center mt-5">Героев пока нет</h5>;
     }
 
-    return arr.map((item) => {
+    return arr.map((item, i) => {
       return (
         <HeroesListItem
           key={item.id}
           onDelete={onDelete}
+          index={i}
           {...item}
         />
       );
@@ -67,7 +69,11 @@ const HeroesList = () => {
   };
 
   const elements = renderHeroesList(filteredHeroes);
-  return <ul>{elements}</ul>;
+  return (
+    <ul>
+      <AnimatePresence>{elements}</AnimatePresence>
+    </ul>
+  );
 };
 
 export default HeroesList;

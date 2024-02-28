@@ -1,4 +1,5 @@
 import { ToastContainer, Bounce } from 'react-toastify';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import HeroesList from '../heroesList/HeroesList';
 import HeroesAddForm from '../heroesAddForm/HeroesAddForm';
 import HeroesFilters from '../heroesFilters/HeroesFilters';
@@ -9,15 +10,17 @@ import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
   return (
     <>
-      <main className="app">
-        <div className="content">
-          <HeroesList />
-          <div className="content__interactive">
-            <HeroesAddForm />
-            <HeroesFilters />
+      <LazyMotion features={domAnimation}>
+        <main className="app">
+          <div className="content">
+            <HeroesList />
+            <div className="content__interactive">
+              <HeroesAddForm />
+              <HeroesFilters />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </LazyMotion>
       <ToastContainer
         position="top-center"
         autoClose={2000}

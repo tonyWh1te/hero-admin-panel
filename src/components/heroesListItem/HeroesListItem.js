@@ -1,4 +1,6 @@
 import { memo } from 'react';
+import { m } from 'framer-motion';
+import { liVariants } from '../../utils/constants';
 
 const heroClasses = {
   fire: 'bg-danger bg-gradient',
@@ -8,17 +10,26 @@ const heroClasses = {
   default: 'bg-warning bg-gradient',
 };
 
-const HeroesListItem = ({ name, description, element, img, id, onDelete }) => {
+const HeroesListItem = ({ name, description, element, img, id, onDelete, index }) => {
   const heroDelete = (id) => () => {
     onDelete(id);
   };
 
   return (
-    <li className={`card flex-row mb-4 shadow-lg text-white ${heroClasses[element]}`}>
+    <m.li
+      className={`card flex-row mb-4 shadow-lg text-white ${heroClasses[element]}`}
+      variants={liVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      transition={{ type: 'spring' }}
+      layout
+      custom={index}
+    >
       <img
         src={img}
         className="img-fluid w-25 d-inline"
-        alt="unknown hero"
+        alt={name}
         style={{ objectFit: 'cover' }}
       />
       <div className="card-body">
@@ -35,7 +46,7 @@ const HeroesListItem = ({ name, description, element, img, id, onDelete }) => {
           aria-label="Close"
         ></button>
       </span>
-    </li>
+    </m.li>
   );
 };
 
