@@ -28,11 +28,12 @@ const HeroesAddForm = () => {
 
   const dispatch = useDispatch();
 
-  const { heroesCreationStatus, filters, filtersLoadingStatus } = useSelector(
+  const heroesCreationStatus = useSelector((state) => state.heroes.heroesCreationStatus);
+
+  const { filters, filtersLoadingStatus } = useSelector(
     (state) => ({
-      heroesCreationStatus: state.heroesCreationStatus,
-      filters: state.filters,
-      filtersLoadingStatus: state.filtersLoadingStatus,
+      filters: state.filters.filters,
+      filtersLoadingStatus: state.filters.filtersLoadingStatus,
     }),
     shallowEqual,
   );

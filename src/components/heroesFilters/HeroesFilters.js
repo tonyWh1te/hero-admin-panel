@@ -29,14 +29,7 @@ const elementsClasses = {
 };
 
 const HeroesFilters = () => {
-  const { filters, filtersLoadingStatus, activeFilter } = useSelector(
-    (state) => ({
-      filters: state.filters,
-      filtersLoadingStatus: state.filtersLoadingStatus,
-      activeFilter: state.activeFilter,
-    }),
-    shallowEqual,
-  );
+  const { filters, filtersLoadingStatus, activeFilter } = useSelector((state) => state.filters);
 
   const dispatch = useDispatch();
 
