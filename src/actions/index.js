@@ -10,7 +10,24 @@ import {
   FILTERS_FETCHED,
   FILTERS_FETCHING_ERROR,
   SET_ACTIVE_FILTER,
+  BASE_URL,
 } from '../utils/constants';
+
+export const heroesFetchThunk = (request) => (dispatch) => {
+  dispatch(heroesFetching());
+
+  request(`${BASE_URL}/heroes`)
+    .then((data) => dispatch(heroesFetched(data)))
+    .catch(() => dispatch(heroesFetchingError()));
+};
+
+export const filtersFetchThunk = (request) => (dispatch) => {
+  dispatch(filtersFetching());
+
+  request(`${BASE_URL}/filters`)
+    .then((data) => dispatch(filtersFetched(data)))
+    .catch(() => dispatch(filtersFetchingError()));
+};
 
 export const heroesFetching = () => {
   return {

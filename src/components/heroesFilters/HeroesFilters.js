@@ -1,14 +1,9 @@
 import { useEffect } from 'react';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHttp } from '../../hooks/http.hook';
 import clsx from 'clsx';
 
-import {
-  filtersFetched,
-  filtersFetching,
-  filtersFetchingError,
-  setActiveFilter,
-} from '../../actions';
+import { setActiveFilter, filtersFetchThunk } from '../../actions';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import { BASE_URL } from '../../utils/constants';
@@ -36,10 +31,7 @@ const HeroesFilters = () => {
   const { request } = useHttp();
 
   useEffect(() => {
-    dispatch(filtersFetching());
-    request(`${BASE_URL}/filters`)
-      .then((data) => dispatch(filtersFetched(data)))
-      .catch(() => dispatch(filtersFetchingError()));
+    dispatch(filtersFetchThunk(request));
 
     // eslint-disable-next-line
   }, []);
