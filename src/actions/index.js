@@ -1,101 +1,100 @@
-import {
-  HEROES_FETCHING,
-  HEROES_FETCHED,
-  HEROES_FETCHING_ERROR,
-  HERO_DELETED,
-  HEROES_CREATED,
-  HEROES_CREATION,
-  HEROES_CREATION_ERROR,
-  FILTERS_FETCHING,
-  FILTERS_FETCHED,
-  FILTERS_FETCHING_ERROR,
-  SET_ACTIVE_FILTER,
-  BASE_URL,
-} from '../utils/constants';
+// import {
+//   heroesFetched,
+//   heroesFetching,
+//   heroesFetchingError,
+// } from '../components/heroesList/heroesSlice';
 
-export const heroesFetchThunk = (request) => (dispatch) => {
-  dispatch(heroesFetching());
+// import {
+//   filtersFetched,
+//   filtersFetching,
+//   filtersFetchingError,
+// } from '../components/heroesFilters/filtersSlice';
 
-  request(`${BASE_URL}/heroes`)
-    .then((data) => dispatch(heroesFetched(data)))
-    .catch(() => dispatch(heroesFetchingError()));
-};
+// export const heroesFetchThunk = (request) => (dispatch) => {
+//   dispatch(heroesFetching());
 
-export const filtersFetchThunk = (request) => (dispatch) => {
-  dispatch(filtersFetching());
+//   request(`${BASE_URL}/heroes`)
+//     .then((data) => dispatch(heroesFetched(data)))
+//     .catch(() => dispatch(heroesFetchingError()));
+// };
 
-  request(`${BASE_URL}/filters`)
-    .then((data) => dispatch(filtersFetched(data)))
-    .catch(() => dispatch(filtersFetchingError()));
-};
+// export const filtersFetchThunk = (request) => (dispatch) => {
+//   dispatch(filtersFetching());
 
-export const heroesFetching = () => {
-  return {
-    type: HEROES_FETCHING,
-  };
-};
+//   request(`${BASE_URL}/filters`)
+//     .then((data) => dispatch(filtersFetched(data)))
+//     .catch(() => dispatch(filtersFetchingError()));
+// };
 
-export const heroesFetched = (heroes) => {
-  return {
-    type: HEROES_FETCHED,
-    payload: heroes,
-  };
-};
+// Создание action creators в нативном redux
 
-export const heroesFetchingError = () => {
-  return {
-    type: HEROES_FETCHING_ERROR,
-  };
-};
+// export const heroesFetching = () => {
+//   return {
+//     type: HEROES_FETCHING,
+//   };
+// };
 
-export const heroDeleted = (id) => {
-  return {
-    type: HERO_DELETED,
-    payload: id,
-  };
-};
+// export const heroesFetched = (heroes) => {
+//   return {
+//     type: HEROES_FETCHED,
+//     payload: heroes,
+//   };
+// };
 
-export const heroesCreated = (newHero) => {
-  return {
-    type: HEROES_CREATED,
-    payload: newHero,
-  };
-};
+// export const heroesFetchingError = () => {
+//   return {
+//     type: HEROES_FETCHING_ERROR,
+//   };
+// };
 
-export const heroesCreation = () => {
-  return {
-    type: HEROES_CREATION,
-  };
-};
+// export const heroDeleted = (id) => {
+//   return {
+//     type: HERO_DELETED,
+//     payload: id,
+//   };
+// };
 
-export const heroesCreationError = () => {
-  return {
-    type: HEROES_CREATION_ERROR,
-  };
-};
+// export const heroesCreated = (newHero) => {
+//   return {
+//     type: HEROES_CREATED,
+//     payload: newHero,
+//   };
+// };
 
-export const filtersFetching = () => {
-  return {
-    type: FILTERS_FETCHING,
-  };
-};
+// export const heroesCreation = () => {
+//   return {
+//     type: HEROES_CREATION,
+//   };
+// };
 
-export const filtersFetched = (filters) => {
-  return {
-    type: FILTERS_FETCHED,
-    payload: filters,
-  };
-};
+// export const heroesCreationError = () => {
+//   return {
+//     type: HEROES_CREATION_ERROR,
+//   };
+// };
 
-export const filtersFetchingError = () => {
-  return {
-    type: FILTERS_FETCHING_ERROR,
-  };
-};
+// export const filtersFetching = () => {
+//   return {
+//     type: FILTERS_FETCHING,
+//   };
+// };
 
-export const setActiveFilter = (activeFilter) => {
-  return {
-    type: SET_ACTIVE_FILTER,
-    payload: activeFilter,
-  };
-};
+// export const filtersFetched = (filters) => {
+//   return {
+//     type: FILTERS_FETCHED,
+//     payload: filters,
+//   };
+// };
+
+// export const filtersFetchingError = () => {
+//   return {
+//     type: FILTERS_FETCHING_ERROR,
+//   };
+// };
+
+// export const setActiveFilter = (activeFilter) => {
+//   return {
+//     type: SET_ACTIVE_FILTER,
+//     payload: activeFilter,
+//   };
+// };

@@ -14,6 +14,8 @@ const initialState = {
   heroesCreationStatus: 'idle',
 };
 
+//создание reducera в нативном redux
+
 const heroes = (state = initialState, action) => {
   switch (action.type) {
     case HEROES_FETCHING:

@@ -2,14 +2,13 @@ import { useCallback } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { AnimatePresence } from 'framer-motion';
 
-import { heroesFetchThunk, heroDeleted } from '../../actions';
+import { heroesFetchThunk, heroesDeleteThunk } from './heroesSlice';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
-import { BASE_URL } from '../../utils/constants';
 
 const HeroesList = () => {
   // мемоизировали селектор
@@ -27,7 +26,7 @@ const HeroesList = () => {
 
   const filteredHeroes = useSelector(fulteredHeroesSelector);
 
-  const heroesLoadingStatus = useSelector((state) => state.heroes.heroesLoadingStatus);
+  const { status, error } = useSelector((state) => state.heroes);
 
   const dispatch = useDispatch();
   const { request } = useHttp();
@@ -40,17 +39,17 @@ const HeroesList = () => {
 
   const onDelete = useCallback(
     (id) => {
-      request(`${BASE_URL}/heroes/${id}`, 'DELETE')
-        .then(() => dispatch(heroDeleted(id)))
-        .catch((e) => console.error(e.message));
+      dispatch(heroesDeleteThunk(id));
     },
-    [dispatch, request],
+
+    // eslint-disable-next-line
+    [],
   );
 
-  if (heroesLoadingStatus === 'loading') {
+  if (status === 'loading') {
     return <Spinner classes="mt-5" />;
-  } else if (heroesLoadingStatus === 'error') {
-    return <ErrorMessage classes="mt-5">Ошибка загрузки</ErrorMessage>;
+  } else if (status === 'error') {
+    return <ErrorMessage classes="mt-5">{error}</ErrorMessage>;
   }
 
   const renderHeroesList = (arr) => {

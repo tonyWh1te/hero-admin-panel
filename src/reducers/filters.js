@@ -11,6 +11,8 @@ const initialState = {
   filters: [],
 };
 
+// создание редьюсера в нативном redux
+
 const filters = (state = initialState, action) => {
   switch (action.type) {
     case FILTERS_FETCHING:

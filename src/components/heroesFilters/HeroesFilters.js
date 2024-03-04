@@ -3,17 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHttp } from '../../hooks/http.hook';
 import clsx from 'clsx';
 
-import { setActiveFilter, filtersFetchThunk } from '../../actions';
+import { filtersFetchThunk } from './filtersSlice';
+import { setActiveFilter } from './filtersSlice';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import { BASE_URL } from '../../utils/constants';
-
-// Задача для этого компонента:
-// Фильтры должны формироваться на основании загруженных данных
-// Фильтры должны отображать только нужных героев при выборе
-// Активный фильтр имеет класс active
-// Изменять json-файл для удобства МОЖНО!
-// Представьте, что вы попросили бэкенд-разработчика об этом
 
 const elementsClasses = {
   all: 'btn-dark',
@@ -24,7 +17,9 @@ const elementsClasses = {
 };
 
 const HeroesFilters = () => {
-  const { filters, filtersLoadingStatus, activeFilter } = useSelector((state) => state.filters);
+  const { filters, filtersLoadingStatus, activeFilter, error } = useSelector(
+    (state) => state.filters,
+  );
 
   const dispatch = useDispatch();
 
@@ -44,7 +39,7 @@ const HeroesFilters = () => {
     if (filtersLoadingStatus === 'loading') {
       return <Spinner />;
     } else if (filtersLoadingStatus === 'error') {
-      return <ErrorMessage>Ошибка загрузки</ErrorMessage>;
+      return <ErrorMessage>{error}</ErrorMessage>;
     }
 
     const renderedFilters = arr.map(({ name, label }) => {

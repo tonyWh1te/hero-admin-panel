@@ -1,21 +1,12 @@
 import { useState, useRef } from 'react';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { createSelector } from '@reduxjs/toolkit';
 import { useHttp } from '../../hooks/http.hook';
 import { toast } from 'react-toastify';
 
-import { heroesCreated, heroesCreation, heroesCreationError } from '../../actions';
+import { heroesCreateThunk } from '../heroesList/heroesSlice';
 import HeroesAddFormLayout from './HeroesAddFormLayout';
 import { BASE_URL } from '../../utils/constants';
-
-// Задача для этого компонента:
-// Реализовать создание нового героя с введенными данными. Он должен попадать
-// в общее состояние и отображаться в списке + фильтроваться
-// Уникальный идентификатор персонажа можно сгенерировать через uiid
-// Усложненная задача:
-// Персонаж создается и в файле json при помощи метода POST
-// Дополнительно:
-// Элементы <option></option> желательно сформировать на базе
-// данных из фильтров
 
 const HeroesAddForm = () => {
   const [hero, setHero] = useState({
@@ -28,15 +19,18 @@ const HeroesAddForm = () => {
 
   const dispatch = useDispatch();
 
-  const heroesCreationStatus = useSelector((state) => state.heroes.heroesCreationStatus);
-
-  const { filters, filtersLoadingStatus } = useSelector(
-    (state) => ({
-      filters: state.filters.filters,
-      filtersLoadingStatus: state.filters.filtersLoadingStatus,
-    }),
-    shallowEqual,
+  const filtersSelector = createSelector(
+    (state) => state.filters.filters,
+    (state) => state.filters.filtersLoadingStatus,
+    (state) => state.filters.error,
+    (filters, filtersLoadingStatus, error) => {
+      return { filters, filtersLoadingStatus, error };
+    },
   );
+
+  const heroesCreationStatus = useSelector((state) => state.heroes.createStatus);
+
+  const { filters, filtersLoadingStatus, error } = useSelector(filtersSelector);
 
   const { request } = useHttp();
 
@@ -86,16 +80,6 @@ const HeroesAddForm = () => {
       .catch((error) => console.error(error));
   };
 
-  const onDataPost = (data) => {
-    dispatch(heroesCreated({ ...data }));
-    toast.success('Герой создан');
-  };
-
-  const onError = () => {
-    dispatch(heroesCreationError());
-    toast.error('Не удалось создать героя');
-  };
-
   const onHeroAdd = (e) => {
     e.preventDefault();
 
@@ -107,8 +91,6 @@ const HeroesAddForm = () => {
       return;
     }
 
-    dispatch(heroesCreation());
-
     const newHero = {
       name,
       element,
@@ -116,9 +98,14 @@ const HeroesAddForm = () => {
       description,
     };
 
-    request(`${BASE_URL}/heroes`, 'POST', JSON.stringify(newHero))
-      .then(onDataPost)
-      .catch(onError)
+    dispatch(heroesCreateThunk(newHero))
+      .unwrap()
+      .then(() => {
+        toast.success('Герой создан');
+      })
+      .catch((rejectedValue) => {
+        toast.error(rejectedValue);
+      })
       .finally(onReset);
   };
 
@@ -126,7 +113,7 @@ const HeroesAddForm = () => {
     if (filtersLoadingStatus === 'loading') {
       return <option>Загрузка списка...</option>;
     } else if (filtersLoadingStatus === 'error') {
-      return <option>Ошибка загрузки</option>;
+      return <option>{error}</option>;
     }
 
     const renderedFilters = filters.map(({ name, label }) => {
