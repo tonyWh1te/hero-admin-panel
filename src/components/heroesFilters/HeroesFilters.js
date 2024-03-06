@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHttp } from '../../hooks/http.hook';
 import clsx from 'clsx';
 
-import { filtersFetchThunk } from './filtersSlice';
-import { setActiveFilter } from './filtersSlice';
+import { filtersFetchThunk, setActiveFilter, selectAllFilters } from './filtersSlice';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -17,9 +16,9 @@ const elementsClasses = {
 };
 
 const HeroesFilters = () => {
-  const { filters, filtersLoadingStatus, activeFilter, error } = useSelector(
-    (state) => state.filters,
-  );
+  const filters = useSelector(selectAllFilters);
+
+  const { filtersLoadingStatus, activeFilter, error } = useSelector((state) => state.filters);
 
   const dispatch = useDispatch();
 

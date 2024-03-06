@@ -5,6 +5,7 @@ import { useHttp } from '../../hooks/http.hook';
 import { toast } from 'react-toastify';
 
 import { heroesCreateThunk } from '../heroesList/heroesSlice';
+import { selectAllFilters } from '../heroesFilters/filtersSlice';
 import HeroesAddFormLayout from './HeroesAddFormLayout';
 import { BASE_URL } from '../../utils/constants';
 
@@ -20,7 +21,7 @@ const HeroesAddForm = () => {
   const dispatch = useDispatch();
 
   const filtersSelector = createSelector(
-    (state) => state.filters.filters,
+    selectAllFilters,
     (state) => state.filters.filtersLoadingStatus,
     (state) => state.filters.error,
     (filters, filtersLoadingStatus, error) => {

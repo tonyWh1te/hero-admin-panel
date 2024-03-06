@@ -2,29 +2,15 @@ import { useCallback } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createSelector } from '@reduxjs/toolkit';
 import { AnimatePresence } from 'framer-motion';
 
-import { heroesFetchThunk, heroesDeleteThunk } from './heroesSlice';
+import { heroesFetchThunk, heroesDeleteThunk, filteredHeroesSelector } from './heroesSlice';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
 const HeroesList = () => {
-  // мемоизировали селектор
-  const fulteredHeroesSelector = createSelector(
-    (state) => state.heroes.heroes,
-    (state) => state.filters.activeFilter,
-    (heroes, activeFilter) => {
-      if (activeFilter === 'all') {
-        return heroes;
-      } else {
-        return heroes.filter((hero) => hero.element === activeFilter);
-      }
-    },
-  );
-
-  const filteredHeroes = useSelector(fulteredHeroesSelector);
+  const filteredHeroes = useSelector(filteredHeroesSelector);
 
   const { status, error } = useSelector((state) => state.heroes);
 
