@@ -1,40 +1,55 @@
-import { useCallback } from 'react';
-import { useHttp } from '../../hooks/http.hook';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
 
-import { heroesFetchThunk, heroesDeleteThunk, filteredHeroesSelector } from './heroesSlice';
+import { useGetHeroesQuery, useDeleteHeroMutation } from '../../api/heroes.api';
 import HeroesListItem from '../heroesListItem/HeroesListItem';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
+// const userId = null;
+
 const HeroesList = () => {
-  const filteredHeroes = useSelector(filteredHeroesSelector);
+  // хук для получения данных с сервера
+  // вызывается после первого рендера
+  const { data: heroes = [], isError, isLoading } = useGetHeroesQuery();
 
-  const { status, error } = useSelector((state) => state.heroes);
+  // Можем добавить условие, при котором запрос не выполнится
+  // undefined, {
+  //   skip: !userId,
+  // };
 
-  const dispatch = useDispatch();
-  const { request } = useHttp();
+  const [deleteHero] = useDeleteHeroMutation();
 
-  useEffect(() => {
-    dispatch(heroesFetchThunk(request));
+  const activeFilter = useSelector((state) => state.filters.activeFilter);
 
-    // eslint-disable-next-line
-  }, []);
+  const filteredHeroes = useMemo(() => {
+    const filteredHeroes = [...heroes];
+
+    if (activeFilter === 'all') {
+      return filteredHeroes;
+    } else {
+      return filteredHeroes.filter((item) => item.element === activeFilter);
+    }
+  }, [heroes, activeFilter]);
+
+  const { error } = useSelector((state) => state.heroes);
 
   const onDelete = useCallback(
     (id) => {
-      dispatch(heroesDeleteThunk(id));
+      deleteHero(id)
+        .unwrap()
+        .catch((error) => toast.error(error.data.message));
     },
 
     // eslint-disable-next-line
     [],
   );
 
-  if (status === 'loading') {
+  if (isLoading) {
     return <Spinner classes="mt-5" />;
-  } else if (status === 'error') {
+  } else if (isError) {
     return <ErrorMessage classes="mt-5">{error}</ErrorMessage>;
   }
 

@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHttp } from '../../hooks/http.hook';
 import clsx from 'clsx';
 
-import { filtersFetchThunk, setActiveFilter, selectAllFilters } from './filtersSlice';
+import { setActiveFilter } from './filtersSlice';
+import { useGetFiltersQuery } from '../../api/filters.api';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
@@ -16,29 +15,21 @@ const elementsClasses = {
 };
 
 const HeroesFilters = () => {
-  const filters = useSelector(selectAllFilters);
+  const { data: filtersData = [], isLoading, isError } = useGetFiltersQuery();
 
-  const { filtersLoadingStatus, activeFilter, error } = useSelector((state) => state.filters);
+  const activeFilter = useSelector((state) => state.filters.activeFilter);
 
   const dispatch = useDispatch();
-
-  const { request } = useHttp();
-
-  useEffect(() => {
-    dispatch(filtersFetchThunk(request));
-
-    // eslint-disable-next-line
-  }, []);
 
   const onFilterSelect = (filter) => () => {
     dispatch(setActiveFilter(filter));
   };
 
-  const renderFilters = (arr, filtersLoadingStatus) => {
-    if (filtersLoadingStatus === 'loading') {
+  const renderFilters = (arr, isLoading, isError) => {
+    if (isLoading) {
       return <Spinner />;
-    } else if (filtersLoadingStatus === 'error') {
-      return <ErrorMessage>{error}</ErrorMessage>;
+    } else if (isError) {
+      return <ErrorMessage>Ошибка загрузки</ErrorMessage>;
     }
 
     const renderedFilters = arr.map(({ name, label }) => {
@@ -68,7 +59,7 @@ const HeroesFilters = () => {
     <div className="card shadow-lg mt-4">
       <div className="card-body">
         <p className="card-text">Отфильтруйте героев по элементам</p>
-        <div className="btn-group">{renderFilters(filters, filtersLoadingStatus)}</div>
+        <div className="btn-group">{renderFilters(filtersData, isLoading, isError)}</div>
       </div>
     </div>
   );

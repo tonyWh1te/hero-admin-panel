@@ -12,13 +12,14 @@ const HeroesAddFormLayout = ({
   onHeroChange,
   onHeroAdd,
   onImageChange,
-  heroesCreationStatus,
+  isCreationLoading,
   imgInputRef,
   filters,
-  filtersLoadingStatus,
+  isFiltersLoading,
   renderFilters,
+  isFiltersError,
 }) => {
-  const btnSubmitContent = heroesCreationStatus === 'creation' ? <Spinner /> : 'Создать';
+  const btnSubmitContent = isCreationLoading ? <Spinner /> : 'Создать';
 
   return (
     <form className="border p-4 shadow-lg rounded">
@@ -75,7 +76,7 @@ const HeroesAddFormLayout = ({
           onChange={onHeroChange}
         >
           <option>Я владею элементом...</option>
-          {renderFilters(filters, filtersLoadingStatus)}
+          {renderFilters(filters, isFiltersLoading, isFiltersError)}
         </select>
         <InputErrorMessage hasError={hasError(errors, element)} />
       </div>

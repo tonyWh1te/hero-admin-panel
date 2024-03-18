@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { useHttp } from '../../hooks/http.hook';
 import { toast } from 'react-toastify';
 
-import { heroesCreateThunk } from '../heroesList/heroesSlice';
+import { useCreateHeroMutation } from '../../api/heroes.api';
+import { useGetFiltersQuery } from '../../api/filters.api';
 import { selectAllFilters } from '../heroesFilters/filtersSlice';
 import HeroesAddFormLayout from './HeroesAddFormLayout';
 import { BASE_URL } from '../../utils/constants';
@@ -18,20 +19,23 @@ const HeroesAddForm = () => {
     errors: false,
   });
 
-  const dispatch = useDispatch();
+  const [createHero, { isLoading: isCreationLoading }] = useCreateHeroMutation();
+  const {
+    data: filtersData = [],
+    isLoading: isFiltersLoading,
+    isError: isFiltersError,
+  } = useGetFiltersQuery();
 
-  const filtersSelector = createSelector(
-    selectAllFilters,
-    (state) => state.filters.filtersLoadingStatus,
-    (state) => state.filters.error,
-    (filters, filtersLoadingStatus, error) => {
-      return { filters, filtersLoadingStatus, error };
-    },
-  );
+  // const filtersSelector = createSelector(
+  //   selectAllFilters,
+  //   (state) => state.filters.filtersLoadingStatus,
+  //   (state) => state.filters.error,
+  //   (filters, filtersLoadingStatus, error) => {
+  //     return { filters, filtersLoadingStatus, error };
+  //   },
+  // );
 
-  const heroesCreationStatus = useSelector((state) => state.heroes.createStatus);
-
-  const { filters, filtersLoadingStatus, error } = useSelector(filtersSelector);
+  // const { filters, filtersLoadingStatus, error } = useSelector(filtersSelector);
 
   const { request } = useHttp();
 
@@ -99,22 +103,22 @@ const HeroesAddForm = () => {
       description,
     };
 
-    dispatch(heroesCreateThunk(newHero))
+    createHero(newHero)
       .unwrap()
       .then(() => {
         toast.success('Герой создан');
       })
       .catch((rejectedValue) => {
-        toast.error(rejectedValue);
+        toast.error(rejectedValue.data.message);
       })
       .finally(onReset);
   };
 
-  const renderFilters = (filters, filtersLoadingStatus) => {
-    if (filtersLoadingStatus === 'loading') {
+  const renderFilters = (filters, isLoading, isError) => {
+    if (isLoading) {
       return <option>Загрузка списка...</option>;
-    } else if (filtersLoadingStatus === 'error') {
-      return <option>{error}</option>;
+    } else if (isError) {
+      return <option>Ошибка загрузки</option>;
     }
 
     const renderedFilters = filters.map(({ name, label }) => {
@@ -140,10 +144,11 @@ const HeroesAddForm = () => {
       onHeroChange={onHeroChange}
       onHeroAdd={onHeroAdd}
       onImageChange={onImageChange}
-      heroesCreationStatus={heroesCreationStatus}
+      isCreationLoading={isCreationLoading}
       imgInputRef={imgInputRef}
-      filters={filters}
-      filtersLoadingStatus={filtersLoadingStatus}
+      filters={filtersData}
+      isFiltersLoading={isFiltersLoading}
+      isFiltersError={isFiltersError}
       renderFilters={renderFilters}
     />
   );
